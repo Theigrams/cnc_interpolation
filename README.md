@@ -2,7 +2,7 @@
 
 ## 项目结构
 
-```
+```bash
 cnc_interpolation/
 ├── core/                      # 核心算法模块
 │   ├── __init__.py
@@ -15,4 +15,18 @@ cnc_interpolation/
 ├── tests/                     # 测试模块
 ├── papers/                    # 第三方论文复现
 └── README.md                  # 项目说明
+```
+
+## 使用说明
+
+## 添加路径
+
+```bash
+export export PYTHONPATH=$PYTHONPATH:$(pwd)
+```
+
+### 测试
+
+```bash
+pytest
 ```
