@@ -68,7 +68,7 @@ class CurveSegment:
         return self.__str__()
 
 
-class LineSegment(CurveSegment):
+class Line(CurveSegment):
     def __init__(self, start, end):
         self.start = np.array(start)
         self.end = np.array(end)
