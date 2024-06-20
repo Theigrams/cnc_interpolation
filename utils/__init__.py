@@ -23,7 +23,3 @@ def handle_dimension(func):
             return func(*args, **kwargs)
 
     return wrapper
-
-
-def normalize(v):
-    return v / np.linalg.norm(v, axis=1, keepdims=True)
