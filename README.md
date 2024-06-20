@@ -19,7 +19,7 @@ cnc_interpolation/
 
 ## 使用说明
 
-## 添加路径
+### 添加路径
 
 ```bash
 export export PYTHONPATH=$PYTHONPATH:$(pwd)
