@@ -74,6 +74,7 @@ class Line(CurveSegment):
         self.end = np.array(end)
         super().__init__()
 
+    @handle_dimension
     def evaluate(self, u):
         if not isinstance(u, (int, float)):
             u = np.array(u).reshape(-1, 1)
@@ -90,6 +91,10 @@ class Line(CurveSegment):
 
     def arc_length_parameterize(self):
         self.arc_parameter = lambda s: s / self.length
+
+    @handle_dimension
+    def curvature(self, u):
+        return u * 0
 
     def __str__(self):
         return f"Line segment: {self.start} -> {self.end}"
