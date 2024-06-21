@@ -4,6 +4,7 @@ import numpy as np
 
 import utils.geometry as geom
 from core.curve import Bezier, Line
+from core.toolpath import Block, ToolPath
 
 CurveList = List[Union[Line, Bezier]]
 
@@ -22,7 +23,7 @@ def compute_d2(L, c1, beta, chord_error):
     """
     N = len(L)
     # Step 1: Initialize d2 according to Eq. (5).
-    d2 = 2 * chord_error / np.sin(beta)
+    d2 = 2 * chord_error / (np.sin(beta) + 1e-6)
     # Step 2: Adjust first and last segments.
     d2[0] = min(d2[0], L[0] / (c1 + 1))
     d2[-1] = min(d2[-1], L[-1] / (c1 + 1))
@@ -38,54 +39,11 @@ def compute_d2(L, c1, beta, chord_error):
     return d2
 
 
-class Block:
-    def __init__(self, segments: CurveList):
-        self.segments = segments
-        self.lengths = np.array([seg.length for seg in segments])
-        self.cum_lengths = np.cumsum(self.lengths)
-
-
-class Path:
-    def __init__(self, points, chord_error):
-        self.points = points
-        self.chord_error = chord_error
-        self.N = len(points) - 1
-        self.tangents, self.L = geom.compute_tangents(points)
-        self.turning_angles = geom.compute_turning_angles(self.tangents)
-        self.beta = self.turning_angles / 2
-        self.reset()
-
-    def reset(self):
-        self.blocks = self.generate_blocks()
-
-    def generate_blocks(self):
-        blocks = []
-        for i in range(self.N):
-            line = Line(self.points[i], self.points[i + 1])
-            blocks.append(Block([line]))
-        return blocks
-
-    def get_v_limit(self, Ts, a_max):
-        """
-        Compute the maximum velocity at each point on the path, using Eq. (25).
-
-        Args:
-            Ts (float): The sampling interval
-            a_max (float): The maximum acceleration.
-        Returns:
-            v_limit (N+1,): Maximum velocity at each point on the path.
-        """
-        v_limit = a_max * Ts / (2 * np.sin(self.beta))
-        v_limit = np.concatenate(([0], v_limit, [0]))
-        return v_limit
-
-
-class SmoothedPath(Path):
+class SmoothedPath(ToolPath):
     def __init__(self, points, chord_error, c1):
-        self.c1 = c1
         super().__init__(points, chord_error)
-
-    def reset(self):
+        self.c1 = c1
+        self.beta = self.turning_angles / 2
         self.d2 = compute_d2(self.L, self.c1, self.beta, self.chord_error)
         self.blocks = self.generate_blocks()
 
@@ -140,6 +98,38 @@ class SmoothedPath(Path):
                 line = Line(spline1(1), spline2(0))
                 blocks.append(Block([spline1, line, spline2]))
         return blocks
+
+    def get_v_limit(self, Ts, v_max, a_max, j_max):
+        """
+        Compute the maximum velocity at each point on the path, using Eq. (16) in Zhao2013.
+
+        Returns:
+            v_limit (N+1,): Maximum velocity at each point on the path.
+        """
+        self.v_max = v_max
+        self.a_max = a_max
+        self.j_max = j_max
+        curvatures = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2)
+        self.curvatures = curvatures
+        v_chord = self.chord_error_limit(curvatures, Ts)
+        v_curvature = self.curvature_limit(curvatures)
+        v_limit = np.minimum(v_chord, v_curvature)
+        v_limit = np.concatenate(([0], v_limit, [0]))
+        v_limit = np.minimum(v_limit, v_max)
+        return v_limit
+
+    def chord_error_limit(self, curvature, Ts):
+        """Yeh SS and Hsu PL, 2002, CAD"""
+        a = 2 * self.chord_error / curvature - self.chord_error**2
+        a = np.maximum(a, 0)
+        v_chord = (2 / Ts) * np.sqrt(a)
+        return v_chord
+
+    def curvature_limit(self, curvature):
+        """Lai JY et al. 2008, IJAMT"""
+        v_acc = np.sqrt(self.a_max / curvature)
+        v_jerk = (self.j_max / curvature**2) ** (1 / 3)
+        return np.minimum(v_acc, v_jerk)
 
 
 if __name__ == "__main__":
