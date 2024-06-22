@@ -178,7 +178,9 @@ class FivePhaseProfile:
 
         t_guess = arc_length / (v_str + v_end)
         t_str = newton(f_type6, t_guess, f_prime_type6)
-        t_end = np.sqrt(t_str**2 + (v_str - v_end) / self.j_max)
+        delta = t_str**2 + (v_str - v_end) / self.j_max
+        delta = np.maximum(delta, 0)
+        t_end = np.sqrt(delta)
         time_profile = np.array([t_str, t_str, 0, t_end, t_end])
         return jerk_profile, time_profile
 
