@@ -25,6 +25,7 @@ class ToolPath:
         self.N = len(points) - 1
         self.tangents, self.L = geom.compute_tangents(points)
         self.turning_angles = geom.compute_turning_angles(self.tangents)
+        self.blocks: List[Block] = []
 
     def generate_blocks(self):
         raise NotImplementedError
