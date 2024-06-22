@@ -22,7 +22,7 @@ class BidirectionalScanner:
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        self.v_limit = self.path.get_v_limit(dt, self.v_max, self.a_max, j_max)
+        self.v_limit = self.path.get_v_limit(dt, self.v_max, self.a_max, j_max=j_max)
 
     def backward_scan(self):
         self.v_limit[-1] = 0

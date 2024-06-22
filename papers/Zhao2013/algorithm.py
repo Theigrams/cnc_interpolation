@@ -109,7 +109,7 @@ class SmoothedPath(ToolPath):
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        curvatures = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2)
+        curvatures = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2) + 1e-6
         self.curvatures = curvatures
         v_chord = self.chord_error_limit(curvatures, Ts)
         v_curvature = self.curvature_limit(curvatures)
