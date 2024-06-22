@@ -7,15 +7,17 @@ from core.curve import Line
 from core.toolpath import Block, LinearPath, ToolPath
 
 
-def plot_path(path: LinearPath):
+def plot_path(path: LinearPath, save=False):
     plt.figure()
-    plt.plot(*path.points.T, "ko-")
+    plt.plot(*path.points.T, "k-")
+    plt.plot(*path.points.T, "ro")
     plt.axis("equal")
-    plt.savefig("path.pdf", bbox_inches="tight")
+    if save:
+        plt.savefig("path.pdf", bbox_inches="tight")
     plt.show()
 
 
-def plot_toolpath(path: ToolPath):
+def plot_toolpath(path: ToolPath, save=False):
     plt.figure()
     blocks: List[Block] = path.blocks
     for block in blocks:
@@ -24,7 +26,8 @@ def plot_toolpath(path: ToolPath):
             style = "b-" if isinstance(curve, Line) else "r-"
             plt.plot(pts[:, 0], pts[:, 1], style)
     plt.axis("equal")
-    plt.savefig("toolpath.pdf", bbox_inches="tight")
+    if save:
+        plt.savefig("toolpath.pdf", bbox_inches="tight")
     plt.show()
 
 
