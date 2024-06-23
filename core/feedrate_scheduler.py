@@ -15,7 +15,7 @@ class FeedrateScheduler:
         self.Ts = Ts
         self.profiles: List[FeedrateProfile] = []
         self.schedule()
-        self.toltal_time = np.sum([profile.total_time for profile in self.profiles])
+        self.total_time = np.sum([profile.total_time for profile in self.profiles])
 
     def schedule(self):
         N = len(self.seg_lengths)
