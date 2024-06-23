@@ -39,7 +39,7 @@ class FivePhaseProfile:
             (self.v_max - v_end) / J
         )
         if v_str < v_end:
-            L_r4 = (v_str + v_end) * np.sqrt((v_end - v_str) / J)
+            L_r4 = (v_str + self.v_max) * np.sqrt((self.v_max - v_str) / J)
         else:
             L_r4 = (v_end + self.v_max) * np.sqrt((self.v_max - v_end) / J)
 
@@ -127,10 +127,10 @@ class FivePhaseProfile:
     def _dec_profile(self, v_str, v_end, arc_length):
 
         def f_type3(t):
-            return self.j_max * t**3 + 2 * v_end * t - arc_length
+            return -self.j_max * t**3 + 2 * v_str * t - arc_length
 
         def f_prime_type3(t):
-            return 3 * self.j_max * t**2 + 2 * v_end
+            return -3 * self.j_max * t**2 + 2 * v_str
 
         t_guess = arc_length / (v_str + v_end)
         t_end = newton(f_type3, t_guess, f_prime_type3)
