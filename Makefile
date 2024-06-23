@@ -1,4 +1,4 @@
-.PHONY: all example train predict test clean help
+.PHONY: all example test add_path clean help
 
 example: ## Run the example naive agent
 	python curve.py
