@@ -97,6 +97,9 @@ class Line(CurveSegment):
         return u * 0
 
     def __str__(self):
+        return f"Line segment: length {self.length}"
+
+    def __repr__(self):
         return f"Line segment: {self.start} -> {self.end}"
 
 
@@ -145,6 +148,9 @@ class BSpline(CurveSegment):
         return np.array(knot_vector)
 
     def __str__(self):
+        return f"BSpline curve: length {self.length}"
+
+    def __repr__(self):
         str1 = f"BSpline curve: {self.control_points.shape[0]} control points, degree {self.degree}"
         str2 = f"  control points: {self.control_points.tolist()}"
         str3 = f"  knots: {self.knots}"
@@ -161,6 +167,9 @@ class Bezier(BSpline):
         super().__init__(control_points, degree, knots)
 
     def __str__(self):
+        return f"Bezier curve: length {self.length}"
+
+    def __repr__(self):
         str1 = f"Bezier curve: {len(self.control_points)} control points, degree {self.degree}"
         str2 = f"  control points: {self.control_points.tolist()}"
         str3 = f"  length: {self.length}"
@@ -223,6 +232,9 @@ class NURBS(CurveSegment):
         return kappa
 
     def __str__(self):
+        return f"NURBS curve: length {self.length}"
+
+    def __repr__(self):
         str1 = f"NURBS curve: {self.control_points.shape[0]} control points, degree {self.degree}"
         str2 = f"  control points: {self.control_points.tolist()}"
         str3 = f"  weights: {self.weights[:,0].tolist()}"
