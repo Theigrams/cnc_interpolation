@@ -17,6 +17,21 @@ class Block:
         self.cum_lengths = np.cumsum(self.lengths)
         self.length = self.cum_lengths[-1]
 
+    def get_u_from_length(self, s: float):
+        """根据曲线段长度, 返回参数 u 和对应的曲线段索引"""
+        idx = np.searchsorted(self.cum_lengths, s, side="left")
+        if idx >= len(self.cum_lengths):
+            raise ValueError(f"Invalid length: {s}, exceeds total length {self.length}")
+        arc_length = s - self.cum_lengths[idx - 1] if idx > 0 else s
+        u = self.curves[idx].get_u_from_length(arc_length)
+        return u, idx
+
+    def __str__(self):
+        return f"Block(curves={[str(curve) for curve in self.curves]})"
+
+    def __repr__(self):
+        return f"Block(curves={self.curves})"
+
 
 class ToolPath:
     def __init__(self, points, chord_error):
@@ -45,6 +60,7 @@ class LinearPath(ToolPath):
         super().__init__(points, chord_error)
         self.beta = self.turning_angles / 2
         self.blocks = self.generate_blocks()
+        self.lengths = np.array([block.length for block in self.blocks])
 
     def generate_blocks(self):
         blocks = []
@@ -64,3 +80,13 @@ class LinearPath(ToolPath):
         v_limit = np.concatenate(([0], v_limit, [0]))
         v_limit = np.minimum(v_limit, v_max)
         return v_limit
+
+
+if __name__ == "__main__":
+    from papers.Zhao2013.algorithm import SmoothedPath
+
+    points = np.array([[2, 0], [4, 2], [2, 4], [0, 2], [2, 0]])
+    chord_error = 0.2
+    smoothed_path = SmoothedPath(points, chord_error, 0.5)
+    for block in smoothed_path.blocks:
+        print(block)
