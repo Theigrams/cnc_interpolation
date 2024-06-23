@@ -24,7 +24,8 @@ class FivePhaseProfile:
 
     def generate_profile(self):
         self.acc_type = self.determine_type(self.v_str, self.v_end, self.arc_length)
-        self.jerk_profile, self.time_profile = self.get_profile(self.acc_type, self.v_str, self.v_end, self.arc_length)
+        self.jerk_profile = np.array([self.j_max, -self.j_max, 0, -self.j_max, self.j_max])
+        self.time_profile = self.get_profile(self.acc_type, self.v_str, self.v_end, self.arc_length)
         self.total_time = np.sum(self.time_profile)
 
     def determine_type(self, v_str, v_end, arc_length):
@@ -106,13 +107,11 @@ class FivePhaseProfile:
             raise Exception("Invalid time value")
 
     def _cv_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.zeros(5)
         t_c = 2 * arc_length / (v_str + v_end)
         time_profile = np.array([0, 0, t_c, 0, 0])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _acc_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([self.j_max, -self.j_max, 0, 0, 0])
 
         def f_type2(t):
             return self.j_max * t**3 + 2 * v_str * t - arc_length
@@ -123,10 +122,9 @@ class FivePhaseProfile:
         t_guess = arc_length / (v_str + v_end)
         t_str = newton(f_type2, t_guess, f_prime_type2)
         time_profile = np.array([t_str, t_str, 0, 0, 0])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _dec_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([-self.j_max, self.j_max, 0, 0, 0])
 
         def f_type3(t):
             return self.j_max * t**3 + 2 * v_end * t - arc_length
@@ -137,26 +135,23 @@ class FivePhaseProfile:
         t_guess = arc_length / (v_str + v_end)
         t_end = newton(f_type3, t_guess, f_prime_type3)
         time_profile = np.array([0, 0, 0, t_end, t_end])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _acc_cv_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([self.j_max, -self.j_max, 0, 0, 0])
         t_str = np.sqrt((v_end - v_str) / self.j_max)
         L_r4 = (v_str + v_end) * t_str
         t_c = (arc_length - L_r4) / v_end
         time_profile = np.array([t_str, t_str, t_c, 0, 0])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _cv_dec_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([0, 0, 0, -self.j_max, self.j_max])
         t_end = np.sqrt((v_str - v_end) / self.j_max)
         L_r4 = (v_str + v_end) * t_end
         t_c = (arc_length - L_r4) / v_str
         time_profile = np.array([0, 0, t_c, t_end, t_end])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _acc_dec_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([self.j_max, -self.j_max, 0, -self.j_max, self.j_max])
 
         def f_type6(t):
             return (
@@ -182,17 +177,17 @@ class FivePhaseProfile:
         delta = np.maximum(delta, 0)
         t_end = np.sqrt(delta)
         time_profile = np.array([t_str, t_str, 0, t_end, t_end])
-        return jerk_profile, time_profile
+        return time_profile
 
     def _acc_cv_dec_profile(self, v_str, v_end, arc_length):
-        jerk_profile = np.array([self.j_max, -self.j_max, 0, -self.j_max, self.j_max])
+
         t_str = np.sqrt((self.v_max - v_str) / self.j_max)
         t_end = np.sqrt((self.v_max - v_end) / self.j_max)
         L_acc = (v_str + self.v_max) * t_str
         L_dec = (self.v_max + v_end) * t_end
         t_c = (arc_length - L_acc - L_dec) / self.v_max
         time_profile = np.array([t_str, t_str, t_c, t_end, t_end])
-        return jerk_profile, time_profile
+        return time_profile
 
     def run_phase_1(self, t):
         J, v_str = self.j_max, self.v_str
