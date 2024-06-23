@@ -6,8 +6,11 @@
 cnc_interpolation/
 ├── core/                      # 核心算法模块
 │   ├── __init__.py
-│   ├── curve.py              # 曲线类定义 (直线、B样条等)
-│   ├── feedrate_planner.py   # 进给率规划类
+│   ├── curve.py              # 曲线类定义 (直线、B样条、Bezier、NURBS)
+│   ├── toolpath.py           # 刀具路径类定义
+│   ├── look_ahead.py         # 前瞻规划类定义
+│   ├── feedrate_profile.py    # 进给率曲线类定义
+│   ├── feedrate_scheduler.py # 进给率调度器类
 │   └── interpolator.py       # 插补器类
 ├── docs/                      # 原理文档
 ├── examples/                  # 示例代码
