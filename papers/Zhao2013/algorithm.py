@@ -45,7 +45,7 @@ class SmoothedPath(ToolPath):
         self.c1 = c1
         self.beta = self.turning_angles / 2
         self.d2 = compute_d2(self.L, self.c1, self.beta, self.chord_error)
-        self.curvatures = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2) + 1e-6
+        self.curvature_peaks = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2) + 1e-6
         self.blocks = self.generate_blocks()
         self.lengths = np.array([block.length for block in self.blocks])
 
@@ -111,8 +111,8 @@ class SmoothedPath(ToolPath):
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        v_chord = self.chord_error_limit(self.curvatures, Ts)
-        v_curvature = self.curvature_limit(self.curvatures)
+        v_chord = self.chord_error_limit(self.curvature_peaks, Ts)
+        v_curvature = self.curvature_limit(self.curvature_peaks)
         v_limit = np.minimum(v_chord, v_curvature)
         v_limit = np.concatenate(([0], v_limit, [0]))
         v_limit = np.minimum(v_limit, v_max)
