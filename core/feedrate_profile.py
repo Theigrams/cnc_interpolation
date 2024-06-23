@@ -13,14 +13,14 @@ class FivePhaseProfile:
         "ACC_CV_DEC": 7,
     }
 
-    def __init__(self, v_str, v_end, arc_length, v_max, a_max, j_max, dt):
+    def __init__(self, v_str, v_end, arc_length, v_max, a_max, j_max, Ts):
         self.v_str = v_str
         self.v_end = v_end
         self.arc_length = arc_length
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        self.dt = dt  # 插补周期
+        self.Ts = Ts  # 插补周期
 
     def generate_profile(self):
         self.acc_type = self.determine_type(self.v_str, self.v_end, self.arc_length)
@@ -32,7 +32,7 @@ class FivePhaseProfile:
             raise Exception("Invalid velocity values")
 
         J = self.j_max
-        L_r1 = 2 * v_str * self.dt
+        L_r1 = 2 * v_str * self.Ts
         L_r2 = (v_str + v_end) * np.sqrt(np.abs(v_end - v_str) / J)
         L_r3 = (v_str + self.v_max) * np.sqrt((self.v_max - v_str) / J) + (self.v_max + v_end) * np.sqrt(
             (self.v_max - v_end) / J

@@ -5,24 +5,24 @@ from core.toolpath import ToolPath
 
 
 class BidirectionalScanner:
-    def __init__(self, path: ToolPath, dt: float, v_max: float, a_max: float, j_max: float):
+    def __init__(self, path: ToolPath, Ts: float, v_max: float, a_max: float, j_max: float):
         """
         Perform bidirectional scanning to calculate the feedrate limitation.
 
         Args:
             path (ToolPath): The toolpath to be scanned.
-            dt (float): The sampling interval.
+            Ts (float): The sampling interval.
             v_max (float): The maximum velocity.
             a_max (float): The maximum acceleration.
             j_max (float): The maximum jerk.
         """
         self.path = path
         self.error = path.chord_error
-        self.dt = dt
+        self.Ts = Ts
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        self.v_limit = self.path.get_v_limit(dt, self.v_max, self.a_max, j_max=j_max)
+        self.v_limit = self.path.get_v_limit(Ts, self.v_max, self.a_max, j_max=j_max)
         self.backward_scan()
         self.forward_scan()
 
