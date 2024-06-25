@@ -1,5 +1,6 @@
 import numpy as np
 
+from utils.geometry import normalize
 from utils.integrals import adaptive_integral
 
 
