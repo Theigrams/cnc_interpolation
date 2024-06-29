@@ -48,7 +48,7 @@ class CurveSegment:
         target_u = self.arc_parameter(arc_length)
         return target_u
 
-    def get_points(self, n_points, arc_equal=False):
+    def get_points(self, n_points=100, arc_equal=False):
         """返回曲线上的n_points个点坐标, arc_equal为True时, 返回弧长等分的点"""
         if arc_equal:
             arc_lengths = np.linspace(0, self.length, n_points)
