@@ -50,6 +50,29 @@ def compute_rotation_matrix(angle):
     return np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
 
 
+import numpy as np
+
+
+def rodrigues_rotate(v, k, theta):
+    """
+    Rotate a vector `v` around an axis `k` by an angle `theta` using Rodrigues' rotation formula.
+
+    Parameters:
+    v (numpy.ndarray): The vector to be rotated.
+    k (numpy.ndarray): The axis of rotation.
+    theta (float): The angle of rotation in radians.
+
+    Returns:
+    numpy.ndarray: The rotated vector.
+    """
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
+    k_dot_v = np.dot(k, v)
+    k_cross_v = np.cross(k, v)
+
+    return v * cos_theta + k_cross_v * sin_theta + k * k_dot_v * (1 - cos_theta)
+
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
