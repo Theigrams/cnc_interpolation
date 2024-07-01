@@ -175,6 +175,19 @@ class Bezier(BSpline):
         str3 = f"  length: {self.length}"
         return f"{str1}\n{str2}\n{str3}"
 
+    def split(self, u):
+        """使用 de Casteljau 算法在参数 u 处分割 Bezier 曲线"""
+        ctrl_pts = self.control_points.copy()
+        left_ctrlpts, right_ctrlpts = [ctrl_pts[0]], [ctrl_pts[-1]]
+
+        while len(ctrl_pts) > 1:
+            ctrl_pts = [(1 - u) * ctrl_pts[i] + u * ctrl_pts[i + 1] for i in range(len(ctrl_pts) - 1)]
+            left_ctrlpts.append(ctrl_pts[0])
+            right_ctrlpts.append(ctrl_pts[-1])
+        left_curve = Bezier(left_ctrlpts)
+        right_curve = Bezier(right_ctrlpts)
+        return left_curve, right_curve
+
 
 class NURBS(CurveSegment):
     def __init__(self, control_points, degree, knots, weights=None):
