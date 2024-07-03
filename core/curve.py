@@ -171,29 +171,19 @@ class BSpline(CurveSegment):
         original_spline = BSpline(self.control_points, self.degree, self.knots)
         # 计算 u 的重数
         current_multiplicity = np.sum(np.isclose(self.knots, u))
-        # 确保 u 处的节点重数达到曲线的 degree
+        # 确保 u 处的节点重数达到曲线的 degree+1
         insertions = self.degree - current_multiplicity + 1
-        # 插入 u 所需的次数
+        # 插入节点
         original_spline.insert_knot(u, insertions)
-
-        # 分割曲线
+        # 进行分割
         split_index_right = np.searchsorted(original_spline.knots, u, side="right") - 1
         split_index_left = np.searchsorted(original_spline.knots, u, side="left") - 1
-
-        # 生成左侧曲线的节点和控制点
         left_knots = original_spline.knots[: split_index_right + 1]
-        # left_knots = np.append(left_knots, u)
         left_control_points = original_spline.control_points[: split_index_right - self.degree]
-
-        # 生成右侧曲线的节点和控制点
         right_knots = original_spline.knots[split_index_left + 1 :]
-        # right_knots = np.insert(right_knots, 0, u)
         right_control_points = original_spline.control_points[split_index_left + 1 :]
-
-        # 创建新的B样条曲线
         left_spline = BSpline(left_control_points, self.degree, left_knots)
         right_spline = BSpline(right_control_points, self.degree, right_knots)
-
         return left_spline, right_spline
 
     def __str__(self):
