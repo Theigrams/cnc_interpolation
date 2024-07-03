@@ -113,9 +113,9 @@ class BSpline(CurveSegment):
     def build_curve(self, control_points, degree, knots=None):
         if knots is not None:
             self.knots = np.array(knots)
-            if np.max(self.knots) > 1:
-                print("\033[93mWarning: Normalizing knots to [0, 1]\033[0m")
-                self.knots /= np.max(self.knots)
+            min_knot, max_knot = np.min(self.knots), np.max(self.knots)
+            if not np.isclose(max_knot, 1) or not np.isclose(min_knot, 0):
+                self.knots = (self.knots - min_knot) / (max_knot - min_knot)
         else:
             self.knots = self.generate_knots()
         if len(self.knots) != len(control_points) + degree + 1:
@@ -140,12 +140,61 @@ class BSpline(CurveSegment):
 
     def generate_knots(self):
         """From https://github.com/orbingol/NURBS-Python/blob/5.x/geomdl/knotvector.py"""
-        num_repeat, num_ctrlpts = self.degree, len(self.control_points)
-        num_segments = num_ctrlpts - (self.degree + 1)
-        knot_vector = [0.0 for _ in range(0, num_repeat)]
-        knot_vector += np.linspace(0.0, 1.0, num_segments + 2).tolist()
-        knot_vector += [1.0 for _ in range(0, num_repeat)]
-        return np.array(knot_vector)
+        degree, num_knots = self.degree, len(self.control_points) + self.degree + 1
+        return np.concatenate(([0] * degree, np.linspace(0, 1, num_knots - 2 * degree), [1] * degree))
+
+    def insert_knot(self, knot_value, insertions=1):
+        """
+        Insert a knot into the B-spline curve.
+
+        This method implements Algorithm A5.1 from "The NURBS Book" by Piegl & Tiller, 2nd Edition.
+
+        Parameters:
+        u (float): The knot value to be inserted.
+        insertions (int): The number of times to insert the knot, default is 1.
+        """
+        knot_index = np.searchsorted(self.knots, knot_value, side="right") - 1
+        degree = self.degree
+        for _ in range(insertions):
+            new_control_points = np.zeros((len(self.control_points) + 1, self.control_points.shape[1]))
+            new_control_points[: knot_index - degree + 1] = self.control_points[: knot_index - degree + 1]
+            new_control_points[knot_index + 1 :] = self.control_points[knot_index:]
+            for i in range(knot_index - degree + 1, knot_index + 1):
+                alpha = (knot_value - self.knots[i]) / (self.knots[i + degree] - self.knots[i])
+                new_control_points[i] = alpha * self.control_points[i] + (1 - alpha) * self.control_points[i - 1]
+            self.control_points = new_control_points
+            self.knots = np.insert(self.knots, knot_index + 1, knot_value)
+            knot_index += 1
+
+    def split(self, u):
+        """Split the B-spline curve into two separate curves at the given parameter u."""
+        original_spline = BSpline(self.control_points, self.degree, self.knots)
+        # 计算 u 的重数
+        current_multiplicity = np.sum(np.isclose(self.knots, u))
+        # 确保 u 处的节点重数达到曲线的 degree
+        insertions = self.degree - current_multiplicity + 1
+        # 插入 u 所需的次数
+        original_spline.insert_knot(u, insertions)
+
+        # 分割曲线
+        split_index_right = np.searchsorted(original_spline.knots, u, side="right") - 1
+        split_index_left = np.searchsorted(original_spline.knots, u, side="left") - 1
+
+        # 生成左侧曲线的节点和控制点
+        left_knots = original_spline.knots[: split_index_right + 1]
+        # left_knots = np.append(left_knots, u)
+        left_control_points = original_spline.control_points[: split_index_right - self.degree]
+
+        # 生成右侧曲线的节点和控制点
+        right_knots = original_spline.knots[split_index_left + 1 :]
+        # right_knots = np.insert(right_knots, 0, u)
+        right_control_points = original_spline.control_points[split_index_left + 1 :]
+
+        # 创建新的B样条曲线
+        left_spline = BSpline(left_control_points, self.degree, left_knots)
+        right_spline = BSpline(right_control_points, self.degree, right_knots)
+
+        return left_spline, right_spline
 
     def __str__(self):
         return f"BSpline curve: length {self.length}"
@@ -262,7 +311,7 @@ if __name__ == "__main__":
     # B样条曲线
     control_points = np.array([[5.0, 5.0], [10.0, 10.0], [20.0, 15.0], [35.0, 15.0], [45.0, 10.0], [50.0, 5.0]])
     degree = 3
-    knotvector = [0.0, 0.0, 0.0, 0.0, 0.33, 0.66, 1.0, 1.0, 1.0, 1.0]
+    knotvector = [0.0, 0.0, 0.0, 0.0, 1 / 3, 2 / 3, 1.0, 1.0, 1.0, 1.0]
     curve = BSpline(control_points, degree, knotvector)
     print(curve)
     points = curve.get_points(20)
@@ -270,6 +319,10 @@ if __name__ == "__main__":
     plt.plot(points[:, 0], points[:, 1], "b.-", label="B-spline curve")
     plt.legend()
     plt.show()
+
+    b1, b2 = curve.split(0.5)
+    print(b1)
+    print(b2)
 
     # Bezier曲线
     # control_points = np.array([[5.0, 5.0], [20.0, 15.0], [35.0, 15.0], [50.0, 5.0]])

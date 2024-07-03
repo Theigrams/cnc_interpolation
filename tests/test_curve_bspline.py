@@ -61,3 +61,16 @@ def test_get_points_arc_equal(bspline_curve: BSpline):
     points = curve.get_points(n, arc_equal=True)
     lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
     assert np.allclose(lengths, curve.length / (n - 1), atol=1e-1)
+
+
+def test_split(bspline_curve):
+    curve = bspline_curve
+    u = 0.5
+    left_curve, right_curve = curve.split(u)
+
+    assert left_curve.degree == curve.degree
+    assert right_curve.degree == curve.degree
+    assert np.allclose(left_curve(0), curve(0))
+    assert np.allclose(left_curve(1), curve(u))
+    assert np.allclose(right_curve(0), curve(u))
+    assert np.allclose(right_curve(1), curve(1))
