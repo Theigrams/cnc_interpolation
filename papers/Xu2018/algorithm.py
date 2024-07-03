@@ -113,7 +113,8 @@ class CcrPath(ToolPath):
         # Compute split B-splines
         bspline_segments: CurveList = []
         for i in range(self.N - 1):
-            spline_1, spline_2 = self.split_bspline(bsplines[i])
+            # spline_1, spline_2 = self.split_bspline(bsplines[i])
+            spline_1, spline_2 = bsplines[i].split(0.5)
             bspline_segments.append(spline_1)
             bspline_segments.append(spline_2)
 
