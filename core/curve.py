@@ -223,6 +223,7 @@ class Bezier(BSpline):
             ctrl_pts = [(1 - u) * ctrl_pts[i] + u * ctrl_pts[i + 1] for i in range(len(ctrl_pts) - 1)]
             left_ctrlpts.append(ctrl_pts[0])
             right_ctrlpts.append(ctrl_pts[-1])
+        right_ctrlpts = right_ctrlpts[::-1]
         left_curve = Bezier(left_ctrlpts)
         right_curve = Bezier(right_ctrlpts)
         return left_curve, right_curve
