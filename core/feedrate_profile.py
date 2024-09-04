@@ -171,7 +171,7 @@ class FivePhaseProfile:
                 + 4 * arc_length * v_str
             )
 
-        t_guess = arc_length / (v_str + v_end)
+        t_guess = arc_length / (v_str + v_end + 1e-6)
         t_str = newton(f_type6, t_guess, f_prime_type6)
         delta = t_str**2 + (v_str - v_end) / self.j_max
         delta = np.maximum(delta, 0)
