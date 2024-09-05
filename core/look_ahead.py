@@ -25,6 +25,7 @@ class BidirectionalScanner:
         self.v_limit = self.path.get_v_limit(Ts, self.v_max, self.a_max, j_max=j_max)
         self.backward_scan()
         self.forward_scan()
+        self.v_limit = np.clip(self.v_limit, 0, self.v_max)
 
     def backward_scan(self):
         self.v_limit[-1] = 0

@@ -32,7 +32,8 @@ class FeedrateScheduler:
         profile_data = np.empty((0,), dtype=dtype)
         t_curr = 0
         for profile in self.profiles:
-            ts = np.linspace(0, profile.total_time - 1e-6, n_points)
+            # ts = np.linspace(0, profile.total_time - 1e-6, n_points)
+            ts = np.arange(0, profile.total_time, 0.01)
             for t in ts:
                 s, v, a, j = profile.get_motion_state(t)
                 motion_data = np.array([(t + t_curr, s, v, a, j)], dtype=dtype)
