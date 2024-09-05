@@ -216,7 +216,8 @@ class SevenPhaseProfile:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    p = SevenPhaseProfile(1, 0, 10, 5, 10, 30, 0.002)
+    # p = SevenPhaseProfile(1, 0, 10, 5, 10, 30, 0.002)
+    p = SevenPhaseProfile(7, 0, 10, 10, 10, 30, 0.002)
     p.generate_profile()
     total_t = p.total_time
     S, V, A, J = [], [], [], []

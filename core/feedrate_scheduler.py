@@ -2,7 +2,7 @@ from typing import List
 
 import numpy as np
 
-from core.feedrate_profile import FivePhaseProfile as FeedrateProfile
+from core.feedrate_profiles import FivePhaseProfile as FeedrateProfile
 
 
 class FeedrateScheduler:

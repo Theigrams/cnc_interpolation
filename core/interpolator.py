@@ -1,6 +1,6 @@
 import numpy as np
 
-from core.feedrate_profile import FivePhaseProfile as FeedrateProfile
+from core.feedrate_profiles import FivePhaseProfile as FeedrateProfile
 from core.feedrate_scheduler import FeedrateScheduler
 from core.toolpath import Block, ToolPath
 

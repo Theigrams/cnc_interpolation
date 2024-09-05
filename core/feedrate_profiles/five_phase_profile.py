@@ -252,9 +252,11 @@ if __name__ == "__main__":
     t_str = 1
     t_c = 2
     t_end = 1
-    p1 = FivePhaseProfile(0, 0, 8, 10, 50, 2, 0.002)
-    p1.time_profile = np.array([t_str, t_str, t_c, t_end, t_end])
-    total_t = 2 * t_str + t_c + 2 * t_end
+    p1 = FivePhaseProfile(16.309135038587833, 0, 0.25950864970510024, 100, 3000, 60000, 0.0005)
+    # p1 = FivePhaseProfile(7, 0, 10, 10, 10, 30, 0.002)
+    p1.generate_profile()
+    # total_t = 2 * t_str + t_c + 2 * t_end
+    total_t = p1.total_time
     S, V, A, J = [], [], [], []
     T = np.linspace(0, total_t, 100)
     for t in T:
@@ -294,3 +296,4 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
+# 0.01701142
