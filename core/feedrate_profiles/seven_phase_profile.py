@@ -1,7 +1,22 @@
 import numpy as np
+from typing import Dict, Any
 
 
-def double_s_trajectory(h, v0, v1, v_max, a_max, j_max):
+def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: float, j_max: float) -> Dict[str, Any]:
+    """
+    Calculate the double S-curve trajectory parameters.
+
+    Args:
+        h (float): Total displacement
+        v0 (float): Initial velocity
+        v1 (float): Final velocity
+        v_max (float): Maximum velocity
+        a_max (float): Maximum acceleration
+        j_max (float): Maximum jerk
+
+    Returns:
+        Dict[str, Any]: A dictionary containing trajectory parameters
+    """
     # 初始化输出参数
     v_max_reached, a_max_reached, a_min_reached = False, False, False
 
@@ -100,7 +115,27 @@ def double_s_trajectory(h, v0, v1, v_max, a_max, j_max):
 
 
 class SevenPhaseProfile:
-    def __init__(self, v_str, v_end, arc_length, v_max, a_max, j_max, Ts):
+    """
+    Represents a seven-phase motion profile for trajectory planning.
+
+    This class implements a seven-phase motion profile that includes
+    acceleration, constant velocity, and deceleration phases with
+    smooth jerk transitions.
+    """
+
+    def __init__(self, v_str: float, v_end: float, arc_length: float, v_max: float, a_max: float, j_max: float, Ts: float):
+        """
+        Initialize the SevenPhaseProfile.
+
+        Args:
+            v_str (float): Start velocity
+            v_end (float): End velocity
+            arc_length (float): Total path length
+            v_max (float): Maximum velocity
+            a_max (float): Maximum acceleration
+            j_max (float): Maximum jerk
+            Ts (float): Sampling time
+        """
         self.v_str = v_str
         self.v_end = v_end
         self.arc_length = arc_length
