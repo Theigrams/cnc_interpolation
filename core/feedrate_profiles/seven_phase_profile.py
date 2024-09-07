@@ -1,5 +1,6 @@
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
 
 
 def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: float, j_max: float) -> Dict[str, Any]:
@@ -25,9 +26,11 @@ def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: flo
     if T_j_star < a_max / j_max:
         if h < T_j_star * (v0 + v1):
             print(f"h: {h}, T_j_star: {T_j_star}, v0: {v0}, v1: {v1}")
+            print(f"f14: {h**2 * j_max- (v1 + v0)**2*(v1 - v0)}")
             raise ValueError("Trajectory is not feasible: h > T_j_star * (v0 + v1)")
     else:
         if h < (v0 + v1) * (T_j_star + np.abs(v1 - v0) / a_max) / 2:
+            print(f"h: {h}, T_j_star: {T_j_star}, v0: {v0}, v1: {v1}, a_max: {a_max}")
             raise ValueError("Trajectory is not feasible: h > (v0 + v1) * (T_j_star + np.abs(v1 - v0) / a_max) / 2")
 
     # 假设v_max可达
@@ -123,7 +126,9 @@ class SevenPhaseProfile:
     smooth jerk transitions.
     """
 
-    def __init__(self, v_str: float, v_end: float, arc_length: float, v_max: float, a_max: float, j_max: float, Ts: float):
+    def __init__(
+        self, v_str: float, v_end: float, arc_length: float, v_max: float, a_max: float, j_max: float, Ts: float
+    ):
         """
         Initialize the SevenPhaseProfile.
 

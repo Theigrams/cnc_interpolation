@@ -30,14 +30,14 @@ class BidirectionalScanner:
     def backward_scan(self):
         self.v_limit[-1] = 0
         for i in range(self.path.N - 1, -1, -1):
-            v_je = self.jerk_limit(self.v_limit[i + 1], self.path.L[i])
+            v_je = self.jerk_limit(self.v_limit[i + 1], self.path.lengths[i])
             v_ae = self.acceleration_limit(self.v_limit[i + 1])
             self.v_limit[i] = min(self.v_limit[i], v_je, v_ae)
 
     def forward_scan(self):
         self.v_limit[0] = 0
         for i in range(1, self.path.N + 1):
-            v_je = self.jerk_limit(self.v_limit[i - 1], self.path.L[i - 1])
+            v_je = self.jerk_limit(self.v_limit[i - 1], self.path.lengths[i - 1])
             v_ae = self.acceleration_limit(self.v_limit[i - 1])
             self.v_limit[i] = min(self.v_limit[i], v_je, v_ae)
 
@@ -58,4 +58,4 @@ class BidirectionalScanner:
         f = lambda v: f14(v, v0)
         f_prime = lambda v: f14_prime(v, v0)
         v_je = newton(f, v0 + 0.1, f_prime)
-        return v_je
+        return v_je - 1e-6
