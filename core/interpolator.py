@@ -23,6 +23,7 @@ class Interpolator:
             ("D", np.float64, (self.dim,)),
         ]
         self.data = None
+        self.t = 0
 
     def interpolate(self):
         interpolated_data = np.empty(0, dtype=self.dtype)
@@ -45,9 +46,10 @@ class Interpolator:
             point = block.curves[idx](u)
             tangent = block.curves[idx].derivative(u)
             direction = tangent / (np.linalg.norm(tangent) + 1e-10)
-            data = np.array([(t, point, v, a, j, direction)], dtype=self.dtype)
+            data = np.array([(self.t, point, v, a, j, direction)], dtype=self.dtype)
             interpolated_data = np.append(interpolated_data, data)
             t += self.Ts
+            self.t += self.Ts
         remaining_time = t - total_time
 
         return interpolated_data, remaining_time
