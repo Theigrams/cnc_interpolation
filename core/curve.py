@@ -29,7 +29,7 @@ class CurveSegment:
     def get_length(self, u=1) -> float:
         """计算曲线段从0到u的长度"""
         self._intervals = []
-        length = adaptive_integral(self.arc_length_derivative, 0, u, 1e-8, self._intervals)
+        length = adaptive_integral(self.arc_length_derivative, 0, u, 1e-9, self._intervals)
         return length
 
     def arc_length_parameterize(self):
