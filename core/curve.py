@@ -29,7 +29,7 @@ class CurveSegment:
     def get_length(self, u=1) -> float:
         """计算曲线段从0到u的长度"""
         self._intervals = []
-        length = adaptive_integral(self.arc_length_derivative, 0, u, 1e-7, self._intervals)
+        length = adaptive_integral(self.arc_length_derivative, 0, u, 1e-9, self._intervals)
         return length
 
     def arc_length_parameterize(self):
@@ -41,7 +41,7 @@ class CurveSegment:
         arc_lengths[-1] = self.length  # 修正最后一个弧长值为总长度
         arc_lengths = np.insert(arc_lengths, 0, 0)  # 在开始处插入弧长 0
         # 创建弧长到参数的插值函数
-        self.arc_parameter = interp1d(arc_lengths, parameter_values, kind="linear")
+        self.arc_parameter = interp1d(arc_lengths, parameter_values, kind="cubic")
 
     def get_u_from_length(self, arc_length):
         """根据弧长返回对应的参数u"""

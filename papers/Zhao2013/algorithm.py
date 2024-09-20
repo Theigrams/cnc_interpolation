@@ -40,7 +40,7 @@ def compute_d2(L, c1, beta, chord_error):
 
 
 class SmoothedPath(ToolPath):
-    def __init__(self, points, chord_error, c1):
+    def __init__(self, points, chord_error, c1=0.5):
         super().__init__(points, chord_error)
         self.c1 = c1
         self.beta = self.turning_angles / 2
