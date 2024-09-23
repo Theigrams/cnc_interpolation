@@ -32,7 +32,7 @@ def compute_d2(L, c1, beta, chord_error):
         # meet the condition d2[i] <= L[i] and d2[i] <= L[i + 1]
         while d2[i] > L[i] or d2[i] > L[i + 1]:
             d2[i] /= 2
-    for i in range(N - 3):
+    for i in range(N - 2):
         # meet the conditions of Eq. (11)
         while d2[i] + d2[i + 1] > L[i + 1] / (c1 + 1):
             d2[i], d2[i + 1] = d2[i] / 2, d2[i + 1] / 2
