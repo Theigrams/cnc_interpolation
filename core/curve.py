@@ -41,7 +41,7 @@ class CurveSegment:
         arc_lengths[-1] = self.length  # 修正最后一个弧长值为总长度
         arc_lengths = np.insert(arc_lengths, 0, 0)  # 在开始处插入弧长 0
         # 创建弧长到参数的插值函数
-        self.arc_parameter = interp1d(arc_lengths, parameter_values, kind="cubic")
+        self.arc_parameter = interp1d(arc_lengths, parameter_values, kind="linear")
 
     def get_u_from_length(self, arc_length):
         """根据弧长返回对应的参数u"""

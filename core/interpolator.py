@@ -43,6 +43,8 @@ class Interpolator:
         while t < total_time:
             s, v, a, j = profile.get_motion_state(t)
             u, idx = block.get_u_from_length(s)
+            if u < 0 or u > 1:
+                raise ValueError(f"u is out of range: {u}")
             point = block.curves[idx](u)
             tangent = block.curves[idx].derivative(u)
             direction = tangent / (np.linalg.norm(tangent) + 1e-10)
