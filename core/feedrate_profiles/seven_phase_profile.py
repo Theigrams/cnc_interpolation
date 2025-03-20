@@ -64,7 +64,7 @@ def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: flo
         # v_max不可达，使用公式(3.26a),(3.26b),(3.26c)和(3.27)计算T_a和T_d
         v_max_reached = False
         T_v = 0
-        for _ in range(200):
+        for _ in range(1000):
             delta_v = (
                 (a_max**4 / j_max**2) + 2 * (v0**2 + v1**2) + a_max * (4 * h - 2 * (a_max / j_max) * (v0 + v1))
             )  # (3.27)
@@ -76,7 +76,7 @@ def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: flo
             if T_a > 2 * T_j1 and T_d > 2 * T_j2:
                 break
 
-            a_max *= 0.99
+            a_max *= 0.98
             if a_max <= 1e-6:
                 break
         if T_a < 0 or T_d < 0:
