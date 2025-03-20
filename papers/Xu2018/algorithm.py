@@ -19,6 +19,7 @@ class CcrPath(ToolPath):
         N3N4_limit1 = 3 * chord_error / np.cos(self.alpha / 2)  # Eq. (4)
         N3N4_limit2 = self.N0N4_list / (4 * np.cos((self.alpha - self.theta) / 2) + 1)  # Eq. (11)
         self.N3N4_list = np.minimum(N3N4_limit1, N3N4_limit2)
+        self.chord_errors = self.N3N4_list * np.cos(self.alpha / 2) / 3
         self.blocks = self.generate_blocks()
         self.lengths = np.array([block.length for block in self.blocks])
 
@@ -153,7 +154,7 @@ class CcrPath(ToolPath):
 
     def chord_error_limit(self, curvature, Ts):
         """Yeh SS and Hsu PL, 2002, CAD"""
-        a = 2 * self.chord_error / curvature - self.chord_error**2
+        a = 2 * self.chord_errors / curvature - self.chord_errors**2
         a = np.maximum(a, 0)
         v_chord = (2 / Ts) * np.sqrt(a)
         return v_chord

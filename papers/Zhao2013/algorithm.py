@@ -46,6 +46,7 @@ class SmoothedPath(ToolPath):
         self.beta = self.turning_angles / 2
         self.d2 = compute_d2(self.L, self.c1, self.beta, self.chord_error)
         self.curvature_peaks = 4 * np.sin(self.beta) / (3 * self.d2 * np.cos(self.beta) ** 2) + 1e-6
+        self.chord_errors = self.d2 * np.sin(self.beta) / 2
         self.blocks = self.generate_blocks()
         self.lengths = np.array([block.length for block in self.blocks])
 
@@ -120,7 +121,7 @@ class SmoothedPath(ToolPath):
 
     def chord_error_limit(self, curvature, Ts):
         """Yeh SS and Hsu PL, 2002, CAD"""
-        a = 2 * self.chord_error / curvature - self.chord_error**2
+        a = 2 * self.chord_errors / curvature - self.chord_errors**2
         a = np.maximum(a, 0)
         v_chord = (2 / Ts) * np.sqrt(a)
         return v_chord
