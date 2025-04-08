@@ -36,7 +36,7 @@ def compute_turning_angles(tangents):
     Calculates the turning angles between consecutive tangent vectors.
     """
     dot_product = np.sum(tangents[:-1] * tangents[1:], axis=1)
-    turning_angles = np.arccos(dot_product)
+    turning_angles = np.arccos(np.clip(dot_product, -1, 1))
     return turning_angles
 
 
