@@ -112,8 +112,10 @@ class SmoothedPath(ToolPath):
         self.v_max = v_max
         self.a_max = a_max
         self.j_max = j_max
-        v_chord = self.chord_error_limit(self.curvature_peaks, Ts)
-        v_curvature = self.curvature_limit(self.curvature_peaks)
+        # avoid division by zero
+        curvature_peaks = np.clip(np.abs(self.curvature_peaks), 1e-6, None)
+        v_chord = self.chord_error_limit(curvature_peaks, Ts)
+        v_curvature = self.curvature_limit(curvature_peaks)
         v_limit = np.minimum(v_chord, v_curvature)
         v_limit = np.concatenate(([0], v_limit, [0]))
         v_limit = np.minimum(v_limit, v_max)
