@@ -1,8 +1,9 @@
 import numpy as np
 from scipy.interpolate import BSpline as scipy_BSpline
-from scipy.interpolate import interp1d
 
 from utils import adaptive_integral, handle_dimension
+
+ARC_LENGTH_TABLE_SIZE = 512
 
 
 class CurveSegment:
@@ -34,14 +35,23 @@ class CurveSegment:
 
     def arc_length_parameterize(self):
         """对曲线进行弧长参数化"""
-        # 提取计算弧长时保存的区间和对应弧长值
-        parameter_values = [start_u for start_u, end_u, _ in self._intervals]
-        arc_lengths = np.cumsum([segment_length for _, _, segment_length in self._intervals])
-        parameter_values.append(self._intervals[-1][1])  # 添加最后一个参数值
-        arc_lengths[-1] = self.length  # 修正最后一个弧长值为总长度
-        arc_lengths = np.insert(arc_lengths, 0, 0)  # 在开始处插入弧长 0
-        # 创建弧长到参数的插值函数
-        self.arc_parameter = interp1d(arc_lengths, parameter_values, kind="linear")
+        # The adaptive integration intervals make the total arc length accurate,
+        # but they are not necessarily dense enough for the inverse map s -> u.
+        # Build a dedicated monotone lookup table so interpolation by arc length
+        # remains stable on high-speed-variation B-spline/NURBS segments.
+        parameter_values = np.linspace(0.0, 1.0, ARC_LENGTH_TABLE_SIZE + 1)
+        points = self.evaluate(parameter_values)
+        chord_lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
+        arc_lengths = np.insert(np.cumsum(chord_lengths), 0, 0.0)
+
+        if arc_lengths[-1] > 0:
+            arc_lengths *= self.length / arc_lengths[-1]
+
+        def arc_parameter(arc_length):
+            arc_length = np.clip(arc_length, 0.0, self.length)
+            return np.interp(arc_length, arc_lengths, parameter_values)
+
+        self.arc_parameter = arc_parameter
 
     def get_u_from_length(self, arc_length):
         """根据弧长返回对应的参数u"""

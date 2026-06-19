@@ -63,6 +63,42 @@ def test_get_points_arc_equal(bspline_curve: BSpline):
     assert np.allclose(lengths, curve.length / (n - 1), atol=1e-1)
 
 
+def test_arc_length_inverse_handles_nonuniform_bspline_speed():
+    control_points = np.array(
+        [
+            [46.86602751938925, 42.24359707464073],
+            [46.85051349516894, 42.197013509718005],
+            [46.82115448550682, 42.103290529154016],
+            [46.692402615965996, 41.68050544830902],
+            [46.692402615965996, 41.68050544830902],
+            [46.64920425, 41.53966055],
+        ],
+        dtype=float,
+    )
+    knots = np.array(
+        [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0 / 3.0,
+            2.0 / 3.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+        ],
+        dtype=float,
+    )
+    curve = BSpline(control_points, 3, knots)
+    target_arc_lengths = np.linspace(0.0, curve.length, 101)
+    points = curve(curve.get_u_from_length(target_arc_lengths))
+    chord_lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
+    target_step = curve.length / 100
+
+    assert chord_lengths.max() / target_step < 1.01
+
+
 def test_split(bspline_curve):
     curve = bspline_curve
     u = 0.5
