@@ -76,7 +76,7 @@ def double_s_trajectory(h: float, v0: float, v1: float, v_max: float, a_max: flo
             if T_a > 2 * T_j1 and T_d > 2 * T_j2:
                 break
 
-            a_max *= 0.98
+            a_max *= 0.99
             if a_max <= 1e-6:
                 break
         if T_a < 0 or T_d < 0:
